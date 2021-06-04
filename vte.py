@@ -1,6 +1,8 @@
 """
 命令词前缀：肥肥
 命令词：0. 重做 1. 撤销 2. 删除 3. 删行 4. 下一行
+       5. 逗号 6. 句号 7. （左/右）引号 8. （左/右）半角
+第8个指令输出是：“「”或者“」”
 """
 #!/usr/bin/env python
 
@@ -40,7 +42,6 @@ class Window(QWidget):
         self.setLayout(vbox)
 
         self.scrollable_text_area = QTextEdit()
-        self.scrollable_text_area.lineWrapColumnOrWidth = 15
 
         self.scrollable_text_area.setFontPointSize(32)
         vbox.addWidget(self.scrollable_text_area)
@@ -53,9 +54,42 @@ class Window(QWidget):
             (f"{prefix}下一行",       self.on_newline),
             (f"{prefix}删行",         self.on_delete_line),
             (f"{prefix}删除",         self.on_delete),
+            (f"{prefix}逗号",         self.on_comma),
+            (f"{prefix}句号",         self.on_dot),
+            (f"{prefix}左引号",         self.on_lquote),
+            (f"{prefix}右引号",         self.on_rquote),
+            (f"{prefix}左半角",         self.on_lb),
+            (f"{prefix}右半角",         self.on_rb),
+            
         ]
         self.scrollable_text_area.textChanged.connect(self.ai_process)
         self.open_current_file()
+
+    def on_comma(self, cmd):
+        self.delete_back_n(len(cmd))
+        self.scrollable_text_area.insertPlainText("，")
+
+    def on_dot(self, cmd):
+        self.delete_back_n(len(cmd))
+        self.scrollable_text_area.insertPlainText("。")
+    
+    def on_lquote(self, cmd):
+        self.delete_back_n(len(cmd))
+        self.scrollable_text_area.insertPlainText("“")
+    
+    def on_rquote(self, cmd):
+        self.delete_back_n(len(cmd))
+        self.scrollable_text_area.insertPlainText("”")
+    
+    def on_lb(self, cmd):
+        self.delete_back_n(len(cmd))
+        self.scrollable_text_area.insertPlainText("「")
+    
+    def on_rb(self, cmd):
+        self.delete_back_n(len(cmd))
+        self.scrollable_text_area.insertPlainText("」")
+    
+
 
     def on_undo(self, cmd):
         keyboard.press(Key.ctrl)
